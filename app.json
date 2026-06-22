@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "AI记账",
+    "slug": "ai-bookkeeper",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": false,
+    "scheme": "bookkeeper",
+    "splash": { "backgroundColor": "#6366F1" },
+    "ios": { "supportsTablet": false },
+    "android": {
+      "adaptiveIcon": { "backgroundColor": "#6366F1" },
+      "package": "com.bookkeeper.ai",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [{ "scheme": "bookkeeper", "host": "*", "pathPrefix": "/" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        },
+        {
+          "action": "MAIN",
+          "category": ["LAUNCHER"]
+        }
+      ]
+    },
+    "plugins": ["expo-asset", "expo-font", "expo-status-bar"]
+  }
+}
