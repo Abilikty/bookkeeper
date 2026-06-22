@@ -8,24 +8,51 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
     "scheme": "bookkeeper",
-    "splash": { "backgroundColor": "#6366F1" },
-    "ios": { "supportsTablet": false },
+    "splash": {
+      "backgroundColor": "#6366F1"
+    },
+    "ios": {
+      "supportsTablet": false
+    },
     "android": {
-      "adaptiveIcon": { "backgroundColor": "#6366F1" },
+      "adaptiveIcon": {
+        "backgroundColor": "#1E1B37"
+      },
       "package": "com.bookkeeper.ai",
       "intentFilters": [
         {
           "action": "VIEW",
           "autoVerify": true,
-          "data": [{ "scheme": "bookkeeper", "host": "*", "pathPrefix": "/" }],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "data": [
+            {
+              "scheme": "bookkeeper",
+              "host": "*",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         },
         {
           "action": "MAIN",
-          "category": ["LAUNCHER"]
+          "category": [
+            "LAUNCHER"
+          ]
         }
       ]
     },
-    "plugins": ["expo-asset", "expo-font", "expo-status-bar"]
+    "plugins": [
+      "expo-asset",
+      "expo-font",
+      "expo-status-bar",
+      "expo-sqlite"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "373392b8-ba43-4b9d-89a5-58fd0ff8c80f"
+      }
+    }
   }
 }
