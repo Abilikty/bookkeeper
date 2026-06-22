@@ -1,14 +1,19 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
   FlatList, Modal, Alert, StyleSheet, Animated,
   ActivityIndicator, KeyboardAvoidingView, Platform,
+  Dimensions,
 } from 'react-native';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const MODAL_HEIGHT = SCREEN_HEIGHT * 0.75;
 import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { parseExpense, saveExpense, getExpenses } from '../services/api';
 import { cacheRecentExpenses, getCachedExpenses } from '../utils/storage';
+import { onPaymentDetected, isNotificationEnabled, openNotificationSettings } from '../services/notifications';
 import ExpenseCard from '../components/ExpenseCard';
 import SplitDetail from '../components/SplitDetail';
 
@@ -50,7 +55,35 @@ export default function HomeScreen({ navigation }) {
   useFocusEffect(useCallback(() => {
     loadRecent();
     checkClipboard();
+    checkNotificationPerm();
   }, []));
+
+  // 通知监听 —— 支付通知到达时存入状态，由 useEffect 处理
+  const [pendingPayment, setPendingPayment] = useState(null);
+  useEffect(() => {
+    const unsubscribe = onPaymentDetected(({ amount, receiver }) => {
+      if (amount > 0) setPendingPayment({ amount, receiver });
+    });
+    return unsubscribe;
+  }, []);
+  useEffect(() => {
+    if (pendingPayment) {
+      const { amount, receiver } = pendingPayment;
+      handleParse(`向${receiver}支付${amount}元`);
+      setPendingPayment(null);
+    }
+  }, [pendingPayment]);
+
+  async function checkNotificationPerm() {
+    const enabled = await isNotificationEnabled();
+    if (!enabled) {
+      // 引导开启通知监听权限
+      Alert.alert('开启自动记账', '开启通知监听后，微信/支付宝支付成功会自动弹窗确认', [
+        { text: '稍后', style: 'cancel' },
+        { text: '去开启', onPress: openNotificationSettings },
+      ]);
+    }
+  }
 
   async function loadRecent() {
     try { const r = await getExpenses({ page: 1, limit: 20 }); setRecentExpenses(r.data || []); cacheRecentExpenses(r.data || []); }
@@ -211,15 +244,18 @@ export default function HomeScreen({ navigation }) {
       />
 
       {/* 确认弹窗 */}
-      <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setModalVisible(false)}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity onPress={() => setModalVisible(false)}><Text style={styles.modalCancel}>取消</Text></TouchableOpacity>
-            <Text style={styles.modalTitle}>确认账单</Text>
-            <TouchableOpacity onPress={handleSave} disabled={loading}>
-              {loading ? <ActivityIndicator size="small" color="#4F46E5" /> : <Text style={styles.modalSave}>保存</Text>}
-            </TouchableOpacity>
-          </View>
+      <Modal visible={modalVisible} animationType="slide" transparent onRequestClose={() => setModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <TouchableOpacity style={styles.modalBackdrop} activeOpacity={1} onPress={() => setModalVisible(false)} />
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHandle} />
+            <View style={styles.modalHeader}>
+              <TouchableOpacity onPress={() => setModalVisible(false)}><Text style={styles.modalCancel}>取消</Text></TouchableOpacity>
+              <Text style={styles.modalTitle}>确认账单</Text>
+              <TouchableOpacity onPress={handleSave} disabled={loading}>
+                {loading ? <ActivityIndicator size="small" color="#4F46E5" /> : <Text style={styles.modalSave}>保存</Text>}
+              </TouchableOpacity>
+            </View>
           {parseResult && (
             <View style={styles.modalBody}>
               <View style={styles.sourceBadge}>
@@ -247,6 +283,7 @@ export default function HomeScreen({ navigation }) {
               <SplitDetail splits={recalc(parseFloat(editAmount) || parseResult.amount, parseResult.people, parseResult.splitType)} totalAmount={parseFloat(editAmount) || parseResult.amount} splitType={parseResult.splitType} />
             </View>
           )}
+          </View>
         </View>
       </Modal>
     </KeyboardAvoidingView>
@@ -295,9 +332,12 @@ const styles = StyleSheet.create({
   emptyIconBox: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#F1F5F9', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
   emptyText: { fontSize: 16, fontWeight: '600', color: '#6B7280' },
   emptyHint: { fontSize: 13, color: '#9CA3AF', marginTop: 6 },
-  // 弹窗
-  modalContainer: { flex: 1, backgroundColor: '#fff' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
+  // 弹窗 — 3/4 底部抽屉
+  modalOverlay: { flex: 1, justifyContent: 'flex-end' },
+  modalBackdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.4)' },
+  modalSheet: { height: MODAL_HEIGHT, backgroundColor: '#fff', borderTopLeftRadius: 22, borderTopRightRadius: 22 },
+  modalHandle: { width: 40, height: 5, backgroundColor: '#D1D5DB', borderRadius: 3, alignSelf: 'center', marginTop: 10 },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
   modalCancel: { fontSize: 16, color: '#6B7280' },
   modalTitle: { fontSize: 17, fontWeight: '700', color: '#1F2937' },
   modalSave: { fontSize: 16, fontWeight: '700', color: '#4F46E5' },
