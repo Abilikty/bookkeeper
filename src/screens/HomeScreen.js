@@ -173,17 +173,6 @@ export default function HomeScreen({ navigation }) {
           <TextInput style={styles.textInput} placeholder="午饭三人AA 120元..." placeholderTextColor="#9CA3AF"
             value={inputText} onChangeText={setInputText} autoFocus multiline={false} returnKeyType="send" onSubmitEditing={() => handleParse()} />
         </View>
-        {!inputText && (
-          <View style={styles.hintBox}>
-            <Text style={styles.hintTitle}>💡 试试这样说</Text>
-            {[{ text: '午饭三人AA 120元', icon: 'fast-food' }, { text: '打车45 我和小王一人一半', icon: 'car' }, { text: '超市买菜200 我自己付', icon: 'cart' }].map((h, i) => (
-              <TouchableOpacity key={i} style={styles.hintItem} onPress={() => { setInputText(h.text); handleParse(h.text); }}>
-                <Ionicons name={h.icon} size={14} color="#4F46E5" />
-                <Text style={styles.hintText} numberOfLines={1}> {h.text}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
         <View style={styles.quickTags}>
           {quickTags.map(t => (
             <TouchableOpacity key={t.label} style={styles.quickTag} onPress={() => setInputText(p => p + t.label)}>
@@ -309,10 +298,6 @@ const styles = StyleSheet.create({
   inputRow: { flexDirection: 'row', alignItems: 'center' },
   inputIconBox: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#EEF2FF', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
   textInput: { flex: 1, fontSize: 16, color: '#1F2937', padding: 0 },
-  hintBox: { marginTop: 14, paddingTop: 14, borderTopWidth: 1, borderTopColor: '#F1F5F9' },
-  hintTitle: { fontSize: 12, color: '#9CA3AF', fontWeight: '500', marginBottom: 8 },
-  hintItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 12, backgroundColor: '#F8FAFC', borderRadius: 10, marginBottom: 4 },
-  hintText: { fontSize: 13, color: '#4F46E5', flex: 1 },
   quickTags: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 14, gap: 8 },
   quickTag: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#F1F5F9', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 20, borderWidth: 1, borderColor: '#E2E8F0' },
   quickTagText: { fontSize: 12, color: '#4F46E5', fontWeight: '500' },
