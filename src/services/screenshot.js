@@ -8,7 +8,7 @@
  *   4. 處理完刪除截圖
  */
 import * as MediaLibrary from 'expo-media-library';
-import TextRecognition from 'react-native-mlkit-ocr';
+import { recognizeImage } from '@react-native-ml-kit/text-recognition';
 
 let lastScan = 0;
 
@@ -46,7 +46,7 @@ export async function scanScreenshot() {
     // OCR
     let ocrText = '';
     try {
-      const result = await TextRecognition.recognize(screenshot.uri);
+      const result = await recognizeImage(screenshot.uri);
       ocrText = result?.text || '';
       if (!ocrText && result?.blocks) {
         ocrText = result.blocks.map(b => b.text).join(' ');
