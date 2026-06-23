@@ -1,0 +1,4 @@
+<resources>
+  <string name="app_name">AI记账</string>
+  <string name="accessibility_service_description">AI记账使用无障碍服务自动识别微信/支付宝支付页面上的金额，无需手动输入。仅在支付页面触发，不会收集其他信息。</string>
+</resources>

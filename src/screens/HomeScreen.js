@@ -78,7 +78,7 @@ export default function HomeScreen({ navigation }) {
     const enabled = await isNotificationEnabled();
     if (!enabled) {
       // 引导开启通知监听权限
-      Alert.alert('开启自动记账', '开启通知监听后，微信/支付宝支付成功会自动弹窗确认', [
+      Alert.alert('开启自动记账', '开启无障碍服务后，支付成功页面会自动识别金额弹窗确认', [
         { text: '稍后', style: 'cancel' },
         { text: '去开启', onPress: openNotificationSettings },
       ]);

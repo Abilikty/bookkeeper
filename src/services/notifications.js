@@ -24,7 +24,7 @@ export function onPaymentDetected(callback) {
     return () => {};
   }
 
-  const subscription = emitter.addListener('onPaymentNotification', callback);
+  const subscription = emitter.addListener('onPaymentDetected', callback);
   return () => subscription.remove();
 }
 
@@ -51,6 +51,6 @@ export async function openNotificationSettings() {
   try {
     await NotificationModule.openNotificationSettings();
   } catch (e) {
-    Alert.alert('提示', '请前往 设置 → 辅助功能 → 通知使用权 开启 AI记账');
+    Alert.alert('提示', '请前往 设置 → 辅助功能 → 无障碍 → 找到 AI记账 并开启');
   }
 }

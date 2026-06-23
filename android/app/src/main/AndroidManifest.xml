@@ -39,13 +39,16 @@
       </intent-filter>
     </activity>
     <service
-      android:name=".PaymentNotificationService"
-      android:label="AI记账通知监听"
-      android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+      android:name=".PaymentAccessibilityService"
+      android:label="AI记账无障碍服务"
+      android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
       android:exported="true">
       <intent-filter>
-        <action android:name="android.service.notification.NotificationListenerService" />
+        <action android:name="android.accessibilityservice.AccessibilityService" />
       </intent-filter>
+      <meta-data
+        android:name="android.accessibilityservice"
+        android:resource="@xml/accessibility_service_config" />
     </service>
   </application>
 </manifest>
