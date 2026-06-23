@@ -13,7 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import { parseExpense, saveExpense, getExpenses } from '../services/api';
 import { cacheRecentExpenses, getCachedExpenses } from '../utils/storage';
-import { onPaymentDetected, isNotificationEnabled, openNotificationSettings } from '../services/notifications';
+import { scanScreenshot } from '../services/screenshot';
 import ExpenseCard from '../components/ExpenseCard';
 import SplitDetail from '../components/SplitDetail';
 
@@ -55,33 +55,13 @@ export default function HomeScreen({ navigation }) {
   useFocusEffect(useCallback(() => {
     loadRecent();
     checkClipboard();
-    checkNotificationPerm();
+    checkScreenshot();
   }, []));
 
-  // 通知监听 —— 支付通知到达时存入状态，由 useEffect 处理
-  const [pendingPayment, setPendingPayment] = useState(null);
-  useEffect(() => {
-    const unsubscribe = onPaymentDetected(({ amount, receiver }) => {
-      if (amount > 0) setPendingPayment({ amount, receiver });
-    });
-    return unsubscribe;
-  }, []);
-  useEffect(() => {
-    if (pendingPayment) {
-      const { amount, receiver } = pendingPayment;
-      handleParse(`向${receiver}支付${amount}元`);
-      setPendingPayment(null);
-    }
-  }, [pendingPayment]);
-
-  async function checkNotificationPerm() {
-    const enabled = await isNotificationEnabled();
-    if (!enabled) {
-      // 引导开启通知监听权限
-      Alert.alert('开启自动记账', '开启无障碍服务后，支付成功页面会自动识别金额弹窗确认', [
-        { text: '稍后', style: 'cancel' },
-        { text: '去开启', onPress: openNotificationSettings },
-      ]);
+  async function checkScreenshot() {
+    const result = await scanScreenshot();
+    if (result && result.amount > 0) {
+      handleParse(`向${result.receiver}支付${result.amount}元`);
     }
   }
 

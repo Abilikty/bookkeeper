@@ -47,7 +47,15 @@
       "expo-asset",
       "expo-font",
       "expo-status-bar",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "AI记账需要访问相册以识别支付截图",
+          "savePhotosPermission": "AI记账需要访问相册以识别支付截图",
+          "isAccessMediaLocationEnabled": false
+        }
+      ]
     ],
     "extra": {
       "eas": {
